@@ -18,5 +18,10 @@
   "bugs": {
     "url": "https://github.com/Jassu225/chatSystem/issues"
   },
-  "homepage": "https://github.com/Jassu225/chatSystem#readme"
+  "homepage": "https://github.com/Jassu225/chatSystem#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "mysql": "^2.15.0"
+  }
 }

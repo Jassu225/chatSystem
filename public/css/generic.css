@@ -1,0 +1,40 @@
+@supports (display: grid) {
+    .grid {
+        display: grid;
+    }
+    .grid-item {
+        justify-self: center;
+        align-self: center;
+    }
+}
+
+@supports not (display: grid) {
+    .grid {
+        display: table;
+    }
+    .grid-item {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+    }
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.full-height {
+    height: 100%;
+}
+
+.hide {
+    display: none;
+}

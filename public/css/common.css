@@ -1,0 +1,16 @@
+body,html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-family: "Open Sans", sans-serif, AppleGothic, "Century Gothic", CenturyGothic, "Helvetica";
+}
+
+.button {
+    display: inline-block;
+    width: 80px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    background-color: #39c073;
+    cursor: pointer;
+}

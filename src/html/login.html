@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Chat System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/public/css/common.css"/>
+    <link rel="stylesheet" href="/public/css/generic.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="/public/css/login.css" />
+</head>
+<body>
+    <div class="grid full-width full-height"> 
+        <form class="grid-item" method="POST" action="/login">
+            <input type="email" name="email" placeholder="E - mail" required/><br />
+            <input type="password" name="password" placeholder="Password" required/><br />
+            <input id="submit" type="submit" value="Submit" class="hide"/>
+            <div class="button" onclick="submit()">Login</div><br />
+            <p class="cursor-pointer link" onclick="gotoForgotPasswordPage()">Forgot password?</p>
+            <b> | </b>
+            <p>Not a user? <span class="cursor-pointer link" onclick="gotoSignUpPage()">Signup</span></p>
+        </form>
+    </div>
+    <script src="/public/js/login.js"></script>
+</body>
+</html>
