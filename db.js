@@ -46,6 +46,8 @@ const db = {
     return await this.exec(query);
   },
 
+  searchUser: async function(keyword) {},
+  
   exec: async function(query) {
 
     try {

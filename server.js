@@ -2,6 +2,8 @@ const express  = require('express');
 const app = express();
 const path = require('path');
 const bodyParser = require('body-parser');  // for parsing data sent in a post request
+const session = require('express-session');
+const md5 = require('md5');
 
 const appRootDir = __dirname;
 const srcDir = path.join(__dirname, "./src/");
@@ -15,9 +17,22 @@ app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 app.use("/public", express.static(publicDir));
+app.use(session({
+  secret: '41a6a4e1b30d55c3295bbc36230a5742', // md5 hash of 'chat_system'
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false },
+  genid: function(req) {
+    return md5(req.body.email);
+  }
+}));
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(srcDir, "./html/login.html"));
+  if(req.session) {
+    console.log(req.session);
+  } else {
+    res.sendFile(path.join(srcDir, "./html/login.html"));
+  }
 });
 
 app.get("/signupPage", (req, res) => {
@@ -62,6 +77,13 @@ app.post("/login", async (req, res) => {
   } else {
     res.sendStatus(401);
   }
+});
+
+app.post("/search", (req, res) => {
+  const keyword = req.body.keyword;
+  console.log(keyword);
+
+  let result = await db.searchUser(keyword);
 });
 
 app.listen(3000, () => console.log('Chat app listening on port 3000!'));
