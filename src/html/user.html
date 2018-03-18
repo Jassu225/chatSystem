@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/public/css/common.css" />
     <link rel="stylesheet" href="/public/css/generic.css" />
     <link rel="stylesheet" href="/public/css/user.css">
+    <script src="/public/js/socket.io.js"></script>
 </head>
 <body>
     <div class="main-grid grid full-height">
@@ -15,7 +16,8 @@
             
         </div>
         <div class="side-panel grid-item center-text">
-            <input type="search" class="search-bar" placeholder="search ..." value="" onkeyup="searchNameInDB(this.value)"/>
+            <div style="background-color: #eae8e8;"><input type="search" class="search-bar" placeholder="search ..." value=""onkeydown="checkKey(event)" onkeyup="searchNameInDB(this.value)"/></div>
+            <div class="search-result position-relative hide"></div>
         </div>
         <div class="msg-panel grid-item">
 
@@ -24,6 +26,7 @@
 
         </div>
     </div>
+    <script src="/public/js/socket.js"></script>
     <script src="/public/js/user.js"></script>
 </body>
 </html>

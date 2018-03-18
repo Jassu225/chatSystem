@@ -1,10 +1,19 @@
 const express  = require('express');
 const app = express();
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
+
 const path = require('path');
 const bodyParser = require('body-parser');  // for parsing data sent in a post request
-const session = require('express-session');
+// const redisStore = require('connect-redis')(session); // for accessing session data in socket
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+const session = require('express-session')({
+    // store: new redisStore({}),
+    secret: '41a6a4e1b30d55c3295bbc36230a5742', // md5 hash of 'chat_system'
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}); // for session management in node.js
+const sharedsession = require("express-socket.io-session");
 const md5 = require('md5');
 
 const appRootDir = __dirname;
@@ -15,20 +24,29 @@ const db = require("./db");
 
 db.connect();
 
+app.use(session);
+
+// io.use(function(socket, next) {
+//   sessionMiddleware(socket.request, socket.request.res, next);
+// });
+
+
+// app.use(sessionMiddleware);
+// app.use(session);
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 app.use("/public", express.static(publicDir));
-app.use(session({
-  secret: '41a6a4e1b30d55c3295bbc36230a5742', // md5 hash of 'chat_system'
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false }
+
+io.use(sharedsession(session, {
+  autoSave:true
 }));
 
 app.get("/", (req, res) => {
-  console.log(req.session);
+  // console.log(req.session);
+  // req.session.destroy();
   if(req.session.email) {
+    res.sendFile(path.join(srcDir, "./html/user.html"));
   } else {
     res.sendFile(path.join(srcDir, "./html/login.html"));
   }
@@ -72,29 +90,41 @@ app.post("/login", async (req, res) => {
   let response = {};
 
   if (result.length == 1) { // match in database
-    console.log(result);
-    res.sendStatus(401);
-    return;
-    res.sendFile(path.join(srcDir, "./html", "./user.html"));
+    // console.log(result);
+    // res.sendStatus(401);
+    // return;
     req.session.email = email;
     req.session.username = result[0].username;
+    res.sendFile(path.join(srcDir, "./html", "./user.html"));
   } else {
     res.sendStatus(401);
   }
 });
 
-app.post("/search", async (req, res) => {
-  const keyword = req.body.keyword;
-  console.log(keyword);
-
-  let result = await db.searchUser(keyword);
-});
+// app.post("/search", async (req, res) => {
+//   const keyword = req.body.keyword;
+//   console.log(keyword);
+//   if (req.session.email) {
+//     let result = await db.searchUser(keyword, req.session.email);
+//     console.log(result);
+//     res.sendStatus(403);
+//   } else {
+//     res.sendStatus(403);  // Forbidden
+//   }
+// });
 
 // IO (socket) connection handler
 
 io.on("connection", (client) => {
+  console.log(client.handshake.session.email);
+  client.on("search-user", async (keyword) => {
+    console.log(keyword);
+    let result = await db.searchUser(keyword, client.handshake.session.email);
+    console.log(result);
+    client.emit('search-result', result);
+  });
   client.on("disconnect", () => {
-
+    console.log(client.handshake.session.username + " disconnected");
   });
 
 });

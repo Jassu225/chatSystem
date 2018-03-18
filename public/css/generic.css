@@ -38,3 +38,7 @@
 .hide {
     display: none;
 }
+
+.position-relative {
+    position: relative;
+}

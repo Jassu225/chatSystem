@@ -21,10 +21,15 @@
   "homepage": "https://github.com/Jassu225/chatSystem#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "connect-redis": "^3.3.3",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
+    "express-socket.io-session": "^1.3.3",
     "md5": "^2.2.1",
     "mysql": "^2.15.0",
     "socket.io": "^2.0.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.2"
   }
 }

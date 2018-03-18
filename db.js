@@ -46,7 +46,10 @@ const db = {
     return await this.exec(query);
   },
 
-  searchUser: async function(keyword) {},
+  searchUser: async function(keyword, email) {
+    const query = `SELECT username FROM userdata WHERE email != '${email}' AND username COLLATE UTF8_GENERAL_CI LIKE '${keyword}%'`;
+    return await this.exec(query);
+  },
   
   exec: async function(query) {
 

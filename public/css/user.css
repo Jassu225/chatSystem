@@ -48,7 +48,7 @@
     height: 15px;
     border: 0;
     border-bottom: 1px solid black;
-    padding: 0;
+    padding: 10px;
     margin: 8px 0;
     background-color: transparent;
 }
@@ -56,6 +56,15 @@
 .search-bar:focus {
     outline: 0;
     /* border-color: #35a75f; */
+}
+
+.search-result {
+    z-index: 5;
+    background-color: #f5f5f5;
+}
+
+.search-result p {
+    display: inline-block;
 }
 
 /* Message Panel */
