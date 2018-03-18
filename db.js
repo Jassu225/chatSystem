@@ -42,7 +42,7 @@ const db = {
   },
 
   verifyUser: async function(user) {
-    const query = `SELECT email, password FROM userdata WHERE email='${user.email}' AND password='${user.password}'`;
+    const query = `SELECT email, password, username FROM userdata WHERE email='${user.email}' AND password='${user.password}'`;
     return await this.exec(query);
   },
 

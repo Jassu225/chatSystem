@@ -1,5 +1,7 @@
 const express  = require('express');
 const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
 const path = require('path');
 const bodyParser = require('body-parser');  // for parsing data sent in a post request
 const session = require('express-session');
@@ -21,15 +23,12 @@ app.use(session({
   secret: '41a6a4e1b30d55c3295bbc36230a5742', // md5 hash of 'chat_system'
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false },
-  genid: function(req) {
-    return md5(req.body.email);
-  }
+  cookie: { secure: false }
 }));
 
 app.get("/", (req, res) => {
-  if(req.session) {
-    console.log(req.session);
+  console.log(req.session);
+  if(req.session.email) {
   } else {
     res.sendFile(path.join(srcDir, "./html/login.html"));
   }
@@ -73,18 +72,32 @@ app.post("/login", async (req, res) => {
   let response = {};
 
   if (result.length == 1) { // match in database
+    console.log(result);
+    res.sendStatus(401);
+    return;
     res.sendFile(path.join(srcDir, "./html", "./user.html"));
+    req.session.email = email;
+    req.session.username = result[0].username;
   } else {
     res.sendStatus(401);
   }
 });
 
-app.post("/search", (req, res) => {
+app.post("/search", async (req, res) => {
   const keyword = req.body.keyword;
   console.log(keyword);
 
   let result = await db.searchUser(keyword);
 });
 
-app.listen(3000, () => console.log('Chat app listening on port 3000!'));
+// IO (socket) connection handler
+
+io.on("connection", (client) => {
+  client.on("disconnect", () => {
+
+  });
+
+});
+
+server.listen(3000, () => console.log('Chat app listening on port 3000!'));
 
