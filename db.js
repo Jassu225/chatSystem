@@ -37,17 +37,17 @@ const db = {
   },
 
   addUser: async function(user) {
-    const query = `INSERT INTO userdata VALUES('${user.email}', '${user.username}' , '${user.password}')`;
+    const query = `INSERT INTO userdata(email, username, password) VALUES('${user.email}', '${user.username}' , '${user.password}')`;
     return await this.exec(query);
   },
 
   verifyUser: async function(user) {
-    const query = `SELECT email, password, username FROM userdata WHERE email='${user.email}' AND password='${user.password}'`;
+    const query = `SELECT email, password, username, id FROM userdata WHERE email='${user.email}' AND password='${user.password}'`;
     return await this.exec(query);
   },
 
   searchUser: async function(keyword, email) {
-    const query = `SELECT username FROM userdata WHERE email != '${email}' AND username COLLATE UTF8_GENERAL_CI LIKE '${keyword}%'`;
+    const query = `SELECT username, email, id FROM userdata WHERE email != '${email}' AND username COLLATE UTF8_GENERAL_CI LIKE '${keyword}%'`;
     return await this.exec(query);
   },
   

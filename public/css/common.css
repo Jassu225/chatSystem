@@ -3,6 +3,8 @@ body,html {
     height: 100%;
     margin: 0;
     font-family: "Open Sans", sans-serif, AppleGothic, "Century Gothic", CenturyGothic, "Helvetica";
+    /* -webkit-font-smoothing: antialiased; */
+    /* -webkit-text-stroke: 1px rgba(0,0,0,0.1); */
 }
 
 .button {

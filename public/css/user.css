@@ -34,17 +34,35 @@
 .top-nav-grid {
     grid-template-rows: 1fr;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-areas:  "search-bar . . .";
+    grid-template-areas:  ". . . selected-user";
 }
 
+.selected-user {
+    grid-column: 4 / 5;
+}
 
+.online-status {
+    float:right;
+    width:10px;
+    height:10px;
+    margin: -5px 10px 0 0;
+    border-radius: 50%;
+}
+
+.online-status.online {
+    background-color: #0fff0f;
+}
+
+.online-status.offline {
+    background-color: red;
+}
 /* Side-panel -> Contact List */
 .side-panel {
     border-right: 1px solid black;
 }
 
 /** Searchbar **/
-.search-bar {
+.search-bar, .type-msg {
     height: 15px;
     border: 0;
     border-bottom: 1px solid black;
@@ -53,7 +71,7 @@
     background-color: transparent;
 }
 
-.search-bar:focus {
+.search-bar:focus, .type-msg:focus {
     outline: 0;
     /* border-color: #35a75f; */
 }
@@ -70,6 +88,20 @@
 /* Message Panel */
 .msg-panel {
     background-color: #efefef;
+    grid-template-rows: 1fr 50px;
+}
+
+.msgs {
+    background-color: #dde5ef;
+}
+
+.msg-sender {
+    grid-row: 2 / 3;
+    width: 100%;
+}
+
+.type-msg {
+    width: 80%;
 }
 
 /* Footer */
