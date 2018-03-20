@@ -62,6 +62,14 @@ function broadcastOffline() {
 //   if (key)
 // }
 
+function userConnected(user) {
+  if(user.id == selectedUserID) {
+    let element = document.getElementsByClassName('online-status')[0];
+    element.classList.remove('offline');
+    element.classList.add('online');
+  }
+}
+
 function sendMsg() {
   let msg = document.getElementsByClassName('type-msg')[0].value;
   if(msg && selectedUserID) {
@@ -77,6 +85,15 @@ function messageReceived(msgObj) {
 
   if (selectedUserID == msgObj.senderID) {
     document.getElementsByClassName('msg-container')[0].innerHTML += `<div class="msg received"><span>${msgObj.message}</span></div>`;
+  }
+}
+
+function userDisconnected(user) {
+  console.log('disconnected user');
+  if(user.id == selectedUserID) {
+    let element = document.getElementsByClassName('online-status')[0];
+    element.classList.remove('online');
+    element.classList.add('offline');
   }
 }
 

@@ -24,6 +24,10 @@ socket.on("connect", (res) => {
   socket.emit("store-socket-id");
 });
 
+socket.on("connected", user => {
+  userConnected(user);
+});
+
 socket.on("search-result", result => {
   console.log(result);
   showResults(result);
@@ -43,4 +47,8 @@ socket.on('user-offline', data => {
 socket.on('msg', data => {
   console.log(data);
   messageReceived(data);
+});
+
+socket.on("user-disconnected", user => {
+  userDisconnected(user);
 });

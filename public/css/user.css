@@ -62,7 +62,7 @@
 }
 
 /** Searchbar **/
-.search-bar, .type-msg {
+.search-bar {
     height: 15px;
     border: 0;
     border-bottom: 1px solid black;
@@ -88,7 +88,7 @@
 /* Message Panel */
 .msg-panel {
     background-color: #efefef;
-    grid-template-rows: 1fr 50px;
+    grid-template-rows: 1fr 40px;
 }
 
 .msgs {
@@ -133,6 +133,16 @@
 .type-msg {
     resize: none;
     width: 80%;
+    height: 20px;
+    margin-bottom: -10px;
+    border: 0;
+    border-bottom: 1px solid black;
+    background-color: transparent;
+}
+
+.send-btn {
+    float: right;
+    margin-right: 30px;
 }
 
 /* Footer */

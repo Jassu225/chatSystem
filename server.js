@@ -123,6 +123,11 @@ app.post("/login", async (req, res) => {
 io.on("connection", (client) => {
   let user = client.handshake.session.user;
   console.log('connected');
+  if (user)
+    client.broadcast.emit('connected', {
+      id: user.id
+    });
+
   client.on("store-socket-id", (data) => {
     if(user)
       socketData[user.id] = client.id;
@@ -165,6 +170,12 @@ io.on("connection", (client) => {
     // console.log(client.handshake.session.user.name + " disconnected");
     if(client.handshake.session && client.handshake.session.user)
       delete socketData[client.handshake.session.user.id];
+    
+    console.log('disconnected');
+    // console.log(io.sockets);
+    client.broadcast.emit('user-disconnected', {
+      id: user.id
+    });
   });
 
 });
