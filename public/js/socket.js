@@ -40,6 +40,7 @@ socket.on('user-offline', data => {
   userIsOffline();
 });
 
-socket.on('msg', msg => {
-  console.log(msg);
+socket.on('msg', data => {
+  console.log(data);
+  messageReceived(data);
 });

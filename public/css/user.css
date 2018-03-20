@@ -92,7 +92,37 @@
 }
 
 .msgs {
-    background-color: #dde5ef;
+    background-color: #e5ddd5;
+}
+
+.msgs .msg {
+    height: 40px;
+    margin: 7px 0;
+}
+
+.msgs .msg span {
+    display: inline-block;
+    padding: 7px 10px;
+    border-radius: 8px;
+}
+
+.msgs .msg.self {
+    text-align: end;
+    right: 0;
+}
+
+.msgs .msg.self span {
+    background-color: #dcf8c6;
+    margin-right: 10px;
+}
+
+.msgs .msg.received {
+    left: 0;
+}
+
+.msgs .msg.received span {
+    background-color: #ffffff;
+    margin-left: 10px;
 }
 
 .msg-sender {
@@ -101,6 +131,7 @@
 }
 
 .type-msg {
+    resize: none;
     width: 80%;
 }
 

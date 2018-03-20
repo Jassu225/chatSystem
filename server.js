@@ -154,7 +154,11 @@ io.on("connection", (client) => {
     let id = data.targetUserID;
 
     if(socketData[id])
-      client.broadcast.to(socketData[id]).emit('msg', msg);
+      client.broadcast.to(socketData[id]).emit('msg', {
+        message: msg,
+        senderID: user.id,
+        senderName: user.name
+      });
   });
 
   client.on("disconnect", () => {

@@ -57,10 +57,27 @@ function broadcastOffline() {
   console.log('out of blur');
 }
 
+// function enterSend(event) {
+//   let key = event.which || event.keyCode;
+//   if (key)
+// }
+
 function sendMsg() {
   let msg = document.getElementsByClassName('type-msg')[0].value;
-  if(msg)
+  if(msg && selectedUserID) {
+    document.getElementsByClassName('type-msg')[0].value = "";
+    document.getElementsByClassName('msg-container')[0].innerHTML += `<div class="msg self"><span>${msg}</span></div>`;
     emitMsg(msg);
+  }
+}
+
+function messageReceived(msgObj) {
+  console.log('selected user id : ' + selectedUserID);
+  console.log('sender id : ' + msgObj.senderID);
+
+  if (selectedUserID == msgObj.senderID) {
+    document.getElementsByClassName('msg-container')[0].innerHTML += `<div class="msg received"><span>${msgObj.message}</span></div>`;
+  }
 }
 
 // function sendAJAX(data) {

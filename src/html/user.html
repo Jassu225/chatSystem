@@ -20,10 +20,12 @@
             <div class="search-result position-relative hide"></div>
         </div>
         <div class="msg-panel grid-item grid">
-            <div class="msgs grid-item full-width full-height"></div>
+            <div class="msgs grid-item full-width full-height">
+                <div class="msg-container full-width"></div>
+            </div>
             <div class="msg-sender grid-item">
-                <input type="text" class="type-msg" onfocus="broadcastTyping()" onblur="broadcastNotTyping()" placeholder="Type here ...."/>
-                <div class="button" onclick="sendMsg()">Send</div>
+                <textarea rows="4" class="type-msg" onfocus="broadcastTyping()" onblur="broadcastNotTyping()" onkeydown="enterSend(event)" placeholder="Type here ...." ></textarea>
+                <div class="button send-btn" onclick="sendMsg()">Send</div>
             </div>
         </div>
         <div class="footer grid-item">
