@@ -61,6 +61,17 @@
     border-right: 1px solid black;
 }
 
+.contact-list .contact:first-child {
+    border-top: 1px solid #aba6a6;
+}
+
+.contact-list .contact {
+    height: 30px;
+    line-height: 30px;
+    text-align: start;
+    border-bottom: 1px solid #aba6a6;
+}
+
 /** Searchbar **/
 .search-bar {
     height: 15px;
@@ -78,11 +89,14 @@
 
 .search-result {
     z-index: 5;
-    background-color: #f5f5f5;
+    background-color: rgba(245, 245, 245, 0.9);
 }
 
 .search-result p {
+    margin: 0;
     display: inline-block;
+    height: 35px;
+    line-height: 35px;
 }
 
 /* Message Panel */
@@ -100,7 +114,7 @@
     margin: 7px 0;
 }
 
-.msgs .msg span {
+.msgs .msg > span {
     display: inline-block;
     padding: 7px 10px;
     border-radius: 8px;
@@ -111,7 +125,8 @@
     right: 0;
 }
 
-.msgs .msg.self span {
+.msgs .msg.self > span:first-child {
+    text-align: start;
     background-color: #dcf8c6;
     margin-right: 10px;
 }
@@ -130,7 +145,17 @@
     width: 100%;
 }
 
+.msg.self.ack-received:after {
+    content: '&#10004;';
+    /* font-family: FontAwesome; */
+    font-weight: normal;
+    font-style: normal;
+    margin: 0px 0px 0px 10px;
+    text-decoration: none;
+}
+
 .type-msg {
+    font-family: "Open Sans", sans-serif, AppleGothic, "Century Gothic", CenturyGothic, "Helvetica" !important;
     resize: none;
     width: 80%;
     height: 20px;

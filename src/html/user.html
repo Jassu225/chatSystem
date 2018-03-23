@@ -15,9 +15,11 @@
         <div class="top-navbar grid-item top-nav-grid grid" >
             <div class="selected-user"></div>
         </div>
-        <div class="side-panel grid-item center-text">
+        <div class="side-panel grid-item center-text position-relative">
             <div style="background-color: #eae8e8;"><input type="search" class="search-bar" placeholder="search ..." value=""onkeydown="checkKey(event)" onkeyup="searchNameInDB(this.value)"/></div>
-            <div class="search-result position-relative hide"></div>
+            <div class="search-result position-absolute full-width hide"></div>
+            <h3>Recents</h3>
+            <div class="contact-list"></div>
         </div>
         <div class="msg-panel grid-item grid">
             <div class="msgs grid-item full-width full-height">

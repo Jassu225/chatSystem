@@ -15,6 +15,7 @@ const session = require('express-session')({
 }); // for session management in node.js
 const sharedsession = require("express-socket.io-session");
 const md5 = require('md5');
+const msgStatusCodes = require('./msgStatusCodes');
 
 const appRootDir = __dirname;
 const srcDir = path.join(__dirname, "./src/");
@@ -44,10 +45,12 @@ io.use(sharedsession(session, {
   autoSave:true
 }));
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   // console.log(req.session);
   // req.session.destroy();
   if(req.session.user) {
+    let result = await db.getFriendsIDs(req.session.user.id);
+    req.session.user.friendsIDs = result[0].friendsIDs;
     res.sendFile(path.join(srcDir, "./html/user.html"));
   } else {
     res.sendFile(path.join(srcDir, "./html/login.html"));
@@ -56,7 +59,7 @@ app.get("/", (req, res) => {
 
 app.get("/signupPage", (req, res) => {
   res.sendFile(path.join(srcDir, "./html", "./signup.html"));
-  db.checkUserTable();
+  // db.checkUserTable();
 });
 
 // app.set('jsonp callback', true);
@@ -98,7 +101,8 @@ app.post("/login", async (req, res) => {
     req.session.user = {
       id: result[0].id,
       email: email,
-      name: result[0].username
+      name: result[0].username,
+      friendsIDs: result[0].friendsIDs
     };
     res.sendFile(path.join(srcDir, "./html", "./user.html"));
   } else {
@@ -123,14 +127,24 @@ app.post("/login", async (req, res) => {
 io.on("connection", (client) => {
   let user = client.handshake.session.user;
   console.log('connected');
-  if (user)
+  if (user && user.id)
     client.broadcast.emit('connected', {
       id: user.id
     });
 
   client.on("store-socket-id", (data) => {
-    if(user)
+    if(user) {
       socketData[user.id] = client.id;
+      client.emit('session-id-stored', user);
+    }
+  });
+
+  client.on('get-friends-list', async data => {
+    let friendsData = [];
+    let ids = user.friendsIDs.replace(/;/g, ",");
+    let result = await db.getFriendsData(ids);
+    console.log(result);
+    client.emit('friends-list', result);
   });
 
   client.on("search-user", async (keyword) => {
@@ -154,16 +168,67 @@ io.on("connection", (client) => {
     }
   });
 
-  client.on('msg', data => {
+  client.on('msg', async data => {
     let msg = data.msg;
+    let msgID = data.msgID;
     let id = data.targetUserID;
+    let isFriend = data.isFriend;
+    let msgStatusCode;
 
-    if(socketData[id])
-      client.broadcast.to(socketData[id]).emit('msg', {
-        message: msg,
-        senderID: user.id,
-        senderName: user.name
+    let sender = null;
+    if(!isFriend) {
+      sender = await db.makeFriends({
+        id: user.id,
+        targetID: id
       });
+      client.emit('friend-added', id);
+    }
+
+    if(socketData[id]) {    // online
+      if(isFriend)
+        client.broadcast.to(socketData[id]).emit('msg', {
+          message: msg,
+          messageID: msgID,
+          senderID: user.id,
+          senderName: user.name,
+          isFriend: isFriend
+        });
+      else
+        client.broadcast.to(socketData[id]).emit('msg', {
+          message: msg,
+          messageID: msgID,
+          senderID: user.id,
+          senderName: user.name,
+          isFriend: isFriend,
+          senderMail: sender.email
+        });
+      msgStatusCode = msgStatusCodes.pushed;
+    } else {    // Offline
+      msgStatusCode = msgStatusCodes.needsPush;
+    }
+
+    let response = await db.saveMsg({
+      senderID: user.id,
+      receiverID: id,
+      msg: msg,
+      msgID: msgID,
+      status: msgStatusCode
+    });
+
+    // client.emit('msg-status', {
+    //  msgStatusCode: msgStatusCode,
+    //  response: response 
+    // });
+
+  });
+
+  client.on('msg-ack', data => {
+    console.log(data);
+    let msgID = data.messageID;
+    let id = data.senderID;
+    client.broadcast.to(socketData[id]).emit('msg-ack', {
+      msgID: msgID
+    });
   });
 
   client.on("disconnect", () => {

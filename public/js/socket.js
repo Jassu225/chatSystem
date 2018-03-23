@@ -12,9 +12,11 @@ function isOnline(id) {
   socket.emit('is-online', id);
 }
 
-function emitMsg(msg) {
+function emitMsg(msgObj) {
   socket.emit('msg', {
-    msg: msg,
+    msg: msgObj.msg,
+    msgID: msgObj.msgID,
+    isFriend: msgObj.isFriend,
     targetUserID: selectedUserID
   });
 }
@@ -22,6 +24,31 @@ function emitMsg(msg) {
 socket.on("connect", (res) => {
   console.log('conneted');
   socket.emit("store-socket-id");
+});
+
+socket.on('session-id-stored', selfData => {
+  myData = selfData;
+  myData.friendsData = [];
+  console.log(myData);
+  if(myData.friendsIDs) {
+    let ids = myData.friendsIDs.split(";");
+      for (let i = 0; i < ids.length; i++) {
+        ids[i] = parseInt(ids[i], 10);
+      }
+    socket.emit('get-friends-list');
+    // myData.ids = ids;
+  }
+});
+
+socket.on('friends-list', friendsData => {
+  console.log(friendsData);
+  myData.friendsData = friendsData;
+  console.log(myData);
+  showFriends();
+});
+
+socket.on('friend-added', id => {
+  addFriend(id);
 });
 
 socket.on("connected", user => {
@@ -47,7 +74,17 @@ socket.on('user-offline', data => {
 socket.on('msg', data => {
   console.log(data);
   messageReceived(data);
+  socket.emit('msg-ack', data);
 });
+
+socket.on('msg-ack', data => {
+  console.log(data);
+  messageAcknowledged(data.msgID);
+});
+// socket.on('msg-status', data => {
+//   console.log(data);
+//   msgStatus(data);
+// });
 
 socket.on("user-disconnected", user => {
   userDisconnected(user);
