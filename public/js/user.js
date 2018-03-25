@@ -63,6 +63,12 @@ function showChat(chat) {
       console.error(err);
     }
   }
+  if(chat.sent.length == 0) {
+    userData[selectedUserID].sent = [];
+  }
+  if(chat.received.length == 0) {
+    userData[selectedUserID].received = [];
+  }
   document.getElementsByClassName('msg-container')[0].innerHTML = innerHTML;
   // console.log(chat);
 }
@@ -199,6 +205,11 @@ function sendMsg() {
   if(msg && selectedUserID) {
     document.getElementsByClassName('type-msg')[0].value = "";
     document.getElementsByClassName('msg-container')[0].innerHTML += `<div id="${msgID}" class="msg self"><span>${msg}</span></div>`;
+    userData[selectedUserID].sent.push({
+      msg: msg,
+      msgID: msgID,
+      status: 0
+    });
     let friend = false;
     if(isFriend(selectedUserID))
       friend = true;
@@ -218,6 +229,8 @@ function scrollToBottom() {
 
 function messageAcknowledged(msgID) {
   console.log(msgID);
+  if(userData[selectedUserID].sent[ userData[selectedUserID].sent.length - 1 ].msgID == msgID)
+    userData[selectedUserID].sent[ userData[selectedUserID].sent.length - 1 ].status = 1;
   document.getElementById(msgID).childNodes[0].innerHTML += " <span style='color: #7b39e4;'>&#10004;</span>";
 }
 
@@ -235,7 +248,15 @@ function messageReceived(msgObj) {
       username: msgObj.senderName,
       email: msgObj.senderMail 
     });
+    userData[msgObj.senderID].sent = [];
+    userData[msgObj.senderID].received = [];
   }
+  userData[msgObj.senderID].received.push({
+    msg: msgObj.message,
+    msgID: msgObj.messageID,
+    status: 1
+  });
+  
   if (selectedUserID == msgObj.senderID) {
     document.getElementsByClassName('msg-container')[0].innerHTML += `<div id="${msgObj.messageID}" class="msg received"><span>${msgObj.message}</span></div>`;
   }

@@ -41,3 +41,12 @@ function sendAJAX(data) {
   xhttp.setRequestHeader("Content-type", "application/json");
   xhttp.send(JSON.stringify(data));
 }
+
+let audio = null;
+function createAudio() {
+  audio = new Audio("/public/21-naruto-main-theme.mp3");
+
+}
+
+createAudio();
+// audio.play();

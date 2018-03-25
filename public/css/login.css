@@ -1,3 +1,9 @@
+body {
+    background-image: url('/public/images/background-1.jpg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
 input[type=text],
 input[type=email],
 input[type=password] {
@@ -5,6 +11,8 @@ input[type=password] {
     border-bottom: 1.5px solid #777;
     padding: 0;
     margin: 8px 0;
+    width: 230px;
+    background-color: transparent;
 }
 
 input[type=text]:focus,
@@ -21,4 +29,11 @@ p {
 .link:hover {
     color: green;
     text-decoration: underline;
+}
+
+form {
+    padding: 60px;
+    background-color: rgba(194, 226, 242, 0.8);
+    border-radius: 16px;
+    box-shadow: -4px 5px 20px 4px rgba(0,0,0,0.2);
 }
