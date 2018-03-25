@@ -37,6 +37,10 @@
     grid-template-areas:  ". . . selected-user";
 }
 
+.logout {
+    width: 40px;
+}
+
 .selected-user {
     grid-column: 4 / 5;
 }
@@ -59,6 +63,7 @@
 /* Side-panel -> Contact List */
 .side-panel {
     border-right: 1px solid black;
+    max-height: 592px;
 }
 
 .contact-list .contact:first-child {
@@ -107,6 +112,8 @@
 
 .msgs {
     background-color: #e5ddd5;
+    max-height: 552px;
+    overflow: auto;
 }
 
 .msgs .msg {

@@ -147,6 +147,19 @@ io.on("connection", (client) => {
     client.emit('friends-list', result);
   });
 
+  client.on('get-chat', async id => {
+    let result = await db.getChat({
+      senderID: user.id,
+      receiverID: id
+    });
+    
+    client.emit('chat', {
+      id: id,
+      sent: result.sent,
+      received: result.received
+    });
+  });
+
   client.on("search-user", async (keyword) => {
     console.log(keyword);
     let result = await db.searchUser(keyword, user.email);
@@ -226,9 +239,22 @@ io.on("connection", (client) => {
     console.log(data);
     let msgID = data.messageID;
     let id = data.senderID;
+    if(data.updateDB) {
+      db.updateMsgStatus({
+        msgID: msgID
+      });
+    }
+
     client.broadcast.to(socketData[id]).emit('msg-ack', {
       msgID: msgID
     });
+  });
+
+  client.on('logout', () => {
+    delete socketData[client.handshake.session.user.id];
+    client.handshake.session.destroy();
+    client.emit('session-destroyed');
+    // client.disconnect();
   });
 
   client.on("disconnect", () => {
@@ -237,6 +263,7 @@ io.on("connection", (client) => {
       delete socketData[client.handshake.session.user.id];
     
     console.log('disconnected');
+    // socketData[user.id] = null;
     // console.log(io.sockets);
     client.broadcast.emit('user-disconnected', {
       id: user.id
@@ -246,4 +273,3 @@ io.on("connection", (client) => {
 });
 
 server.listen(3000, () => console.log('Chat app listening on port 3000!'));
-

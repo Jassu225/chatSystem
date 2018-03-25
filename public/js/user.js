@@ -1,5 +1,6 @@
 var searchData = {};
 var selectedUserID = null;
+var userData = {};
 var myData = null;
 
 function showFriends() {
@@ -18,6 +19,52 @@ function showFriends() {
 
 function appendFriends(friend) {
   document.getElementsByClassName("contact-list")[0].innerHTML += `<div class="contact" onclick="selectUser(${friend.id})">${friend.username}</div>`;
+}
+
+function showChat(chat) {
+  let innerHTML = "";
+  let i = j = 0;
+  try {
+    while( (i < chat.sent.length) || (j < chat.received.length)) {
+      if(chat.sent[i].msgID < chat.received[j].msgID) {
+        innerHTML += `<div id="${chat.sent[i].msgID}" class="msg self"><span>${chat.sent[i].msg}${(chat.sent[i].status == 1)? " <span style='color: #7b39e4;'>&#10004;</span>": ""}</span></div>`;
+        i++;
+      } else {
+        innerHTML += `<div id="${chat.received[j].msgID}" class="msg received"><span>${chat.received[j].msg}</span></div>`;
+        j++;
+        if(chat.received[j].status == 0) {
+          emitMsgAck({
+            messageID: chat.received[j].msgID,
+            senderID: selectedUserID,
+            updateDB: true
+          });
+          chat.received[j].status = 1;
+        }
+      }
+    }
+  } catch(err) {
+    if ( i >= chat.sent.length) {
+      for(; j < chat.received.length; j++) {
+        innerHTML += `<div id="${chat.received[j].msgID}" class="msg received"><span>${chat.received[j].msg}</span></div>`;
+        if(chat.received[j].status == 0) {
+          emitMsgAck({
+            messageID: chat.received[j].msgID,
+            senderID: selectedUserID,
+            updateDB: true
+          });
+          chat.received[j].status = 1;
+        }
+      }
+    } else if (j >= chat.received.length) {
+      for(; i < chat.sent.length; i++) {
+        innerHTML += `<div id="${chat.sent[i].msgID}" class="msg self"><span>${chat.sent[i].msg}${(chat.sent[i].status == 1)? " <span style='color: #7b39e4;'>&#10004;</span>": ""}</span></div>`;
+      }
+    } else {
+      console.error(err);
+    }
+  }
+  document.getElementsByClassName('msg-container')[0].innerHTML = innerHTML;
+  // console.log(chat);
 }
 
 function searchNameInDB(keyword) {
@@ -65,6 +112,15 @@ function selectUser(id) {
   document.getElementsByClassName("search-result")[0].classList.add("hide");
   document.getElementsByClassName("search-bar")[0].value = "";
   isOnline(id);
+  getUserChat(id);
+}
+
+function getUserChat(id) {
+  if(userData.id) { // already fetched
+    showChat(userData.id);
+  } else {
+    getUserChatFromServer(id);
+  }
 }
 
 function userIsOnline(userID) {
@@ -85,8 +141,13 @@ function broadcastNotTyping() {
 
 }
 
-function enterSend(event) {
-
+function enterSend(e) {
+  var evtobj = window.event? event : e;
+  // var x = e.which | e.keyCode;
+  //test1 if (evtobj.ctrlKey) alert("Ctrl");
+  //test2 if (evtobj.keyCode == 122) alert("z");
+  //test 1 & 2
+  if (evtobj.keyCode == 13 && evtobj.ctrlKey) sendMsg();
 }
 
 // function enterSend(event) {
@@ -147,6 +208,12 @@ function sendMsg() {
       isFriend: friend
     });
   }
+  scrollToBottom();
+}
+
+function scrollToBottom() {
+  let  element = document.getElementsByClassName('msgs')[0];
+  element.scrollTo(0, element.scrollHeight);
 }
 
 function messageAcknowledged(msgID) {
@@ -193,6 +260,9 @@ function msgStatus(data) {
   }
 }
 
+function logout() {
+  sendLogout();
+}
 // function sendAJAX(data) {
 //   let xhttp = new XMLHttpRequest();
 //   xhttp.onreadystatechange = function () {

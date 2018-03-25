@@ -3,6 +3,7 @@ body,html {
     min-width: 1000px;
     height: 100%;
     min-height: 600px;
+    max-height: initial;
     margin: 0;
     font-family: "Open Sans", sans-serif, AppleGothic, "Century Gothic", CenturyGothic, "Helvetica" !important;
     /* -webkit-font-smoothing: antialiased; */

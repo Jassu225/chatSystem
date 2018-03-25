@@ -13,20 +13,21 @@
 <body>
     <div class="main-grid grid full-height">
         <div class="top-navbar grid-item top-nav-grid grid" >
+            <img src="/public/images/logout.png" class="logout cursor-pointer" alt="Logout" onclick="logout()"/>
             <div class="selected-user"></div>
         </div>
-        <div class="side-panel grid-item center-text position-relative">
+        <div class="side-panel grid-item full-height center-text position-relative">
             <div style="background-color: #eae8e8;"><input type="search" class="search-bar" placeholder="search ..." value=""onkeydown="checkKey(event)" onkeyup="searchNameInDB(this.value)"/></div>
             <div class="search-result position-absolute full-width hide"></div>
             <h3>Recents</h3>
             <div class="contact-list"></div>
         </div>
-        <div class="msg-panel grid-item grid">
+        <div class="msg-panel grid-item full-height grid">
             <div class="msgs grid-item full-width full-height">
                 <div class="msg-container full-width"></div>
             </div>
             <div class="msg-sender grid-item">
-                <textarea rows="4" class="type-msg" onfocus="broadcastTyping()" onblur="broadcastNotTyping()" onkeydown="enterSend(event)" placeholder="Type here ...." ></textarea>
+                <textarea rows="4" class="type-msg" onfocus="broadcastTyping()" onblur="broadcastNotTyping()" onkeydown="enterSend(event)" placeholder="Type here ...  (CTRL + ENTER to send)" ></textarea>
                 <div class="button send-btn" onclick="sendMsg()">Send</div>
             </div>
         </div>

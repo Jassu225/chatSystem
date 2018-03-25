@@ -21,6 +21,18 @@ function emitMsg(msgObj) {
   });
 }
 
+function emitMsgAck(data) {
+  socket.emit('msg-ack', data);
+}
+
+function getUserChatFromServer(id) {
+  socket.emit('get-chat', id);
+}
+
+function sendLogout() {
+  socket.emit('logout');
+}
+
 socket.on("connect", (res) => {
   console.log('conneted');
   socket.emit("store-socket-id");
@@ -51,6 +63,16 @@ socket.on('friend-added', id => {
   addFriend(id);
 });
 
+socket.on('chat', result => {
+  console.log(result);
+  userData[result.id] = {
+    sent: result.sent,
+    received: result.received
+  };
+  if(selectedUserID == result.id)
+    showChat(userData[result.id]);
+});
+
 socket.on("connected", user => {
   userConnected(user);
 });
@@ -74,7 +96,7 @@ socket.on('user-offline', data => {
 socket.on('msg', data => {
   console.log(data);
   messageReceived(data);
-  socket.emit('msg-ack', data);
+  emitMsgAck(data);
 });
 
 socket.on('msg-ack', data => {
@@ -85,6 +107,10 @@ socket.on('msg-ack', data => {
 //   console.log(data);
 //   msgStatus(data);
 // });
+
+socket.on('session-destroyed', () => {
+  window.location = "/";
+});
 
 socket.on("user-disconnected", user => {
   userDisconnected(user);

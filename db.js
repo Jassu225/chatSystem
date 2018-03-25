@@ -65,6 +65,24 @@ const db = {
     return await this.exec(query);
   },
 
+  getChat: async function(ids) {
+    const query1 = `SELECT msg, msgID, status FROM messages WHERE senderID = ${ids.senderID} AND receiverID = ${ids.receiverID}`;
+    let sent = await this.exec(query1);
+
+    const query2 = `SELECT msg, msgID, status FROM messages WHERE senderID = ${ids.receiverID} AND receiverID = ${ids.senderID}`;
+    let received = await this.exec(query2);
+
+    return {
+      sent: sent,
+      received: received
+    };
+  },
+
+  updateMsgStatus: async function(data) {
+    const query = `UPDATE messages SET status = 1 WHERE msgID = ${data.msgID}`;
+    return await this.exec(query);
+  },
+
   searchUser: async function(keyword, email) {
     const query = `SELECT username, email, id FROM userdata WHERE email != '${email}' AND username COLLATE UTF8_GENERAL_CI LIKE '${keyword}%'`;
     return await this.exec(query);
