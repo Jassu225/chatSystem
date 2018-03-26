@@ -4,8 +4,8 @@ const util = require('util');
 const dbName = "chat_system";
 
 const tables = {
-  userData: "CREATE TABLE IF NOT EXISTS userdata (email VARCHAR(60) NOT NULL, id BIGINT(20) NOT NULL AUTO_INCREMENT, username VARCHAR(20) NOT NULL, password VARCHAR(100) NOT NULL, friendsIDs VARCHAR(1000000), PRIMARY KEY (id), UNIQUE (email) ) ENGINE = InnoDB",
-  msg: "CREATE TABLE IF NOT EXISTS messages (senderID BIGINT NOT NULL, receiverID BIGINT NOT NULL, msg VARCHAR(10000) NOT NULL, msgID VARCHAR(100) NOT NULL, status INT NOT NULL, PRIMARY KEY(senderID, msgID) )"
+  userData: "CREATE TABLE IF NOT EXISTS userdata (email VARCHAR(60) NOT NULL, id BIGINT(20) NOT NULL AUTO_INCREMENT, username VARCHAR(20) NOT NULL, password VARCHAR(100) NOT NULL, friendsIDs VARCHAR(1000000), PRIMARY KEY (id), UNIQUE (email) ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci",
+  msg: "CREATE TABLE IF NOT EXISTS messages (senderID BIGINT NOT NULL, receiverID BIGINT NOT NULL, msg VARCHAR(10000) NOT NULL, msgID VARCHAR(100) NOT NULL, status INT NOT NULL, PRIMARY KEY(senderID, msgID) ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci"
 };
 
 const db = {
@@ -15,6 +15,7 @@ const db = {
     this.connection = mysql.createConnection({
       host     : 'localhost',
       user     : 'root',
+      port     : 3306,
       password : '',
       database : dbName
     });

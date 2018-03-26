@@ -8,17 +8,19 @@ function showFriends() {
   let innerHTML = "";
 
   for(let i = 0; i < myData.friendsData.length; i++) {
-    innerHTML += `<div class="contact cursor-pointer" onclick="selectUser(${myData.friendsData[i].id})">${myData.friendsData[i].username}</div>`;
+    innerHTML += `<div id="contact-id-${myData.friendsData[i].id}" class="contact cursor-pointer" onclick="selectUser(${myData.friendsData[i].id})">${myData.friendsData[i].username} <span class="online-status offline"></span></div>`;
     searchData[myData.friendsData[i].id] = {
       email: myData.friendsData[i].email,
       username: myData.friendsData[i].username
     };
+    isOnline(myData.friendsData[i].id);
   }
   element.innerHTML = innerHTML;
 }
 
 function appendFriends(friend) {
-  document.getElementsByClassName("contact-list")[0].innerHTML += `<div class="contact" onclick="selectUser(${friend.id})">${friend.username}</div>`;
+  document.getElementsByClassName("contact-list")[0].innerHTML += `<div id="contact-id-${friend.id}" class="contact cursor-pointer" onclick="selectUser(${friend.id})">${friend.username} <span class="online-status offline"></span></div>`;
+  isOnline(friend.id);
 }
 
 function showChat(chat) {
@@ -114,7 +116,8 @@ function selectUser(id) {
   selectedUserID = id;
   let selected = document.getElementsByClassName('selected-user')[0];
   selected.innerHTML =  `<span style="font-size: 20px;font-weight:500;color:white;">${searchData[id].username}</span><br />` +
-                            `<span style="font-size: 13px; font-weight: light;color:rgba(255,255,255,0.9);">${searchData[id].email}</span>`;
+                            `<span style="font-size: 13px; font-weight: light;color:rgba(255,255,255,0.9);">${searchData[id].email}</span>` + 
+                            `<span class="online-status offline"></span>`;
   document.getElementsByClassName("search-result")[0].classList.add("hide");
   document.getElementsByClassName("search-bar")[0].value = "";
   isOnline(id);
@@ -130,13 +133,29 @@ function getUserChat(id) {
 }
 
 function userIsOnline(userID) {
-  if (userID === selectedUserID)
-    document.getElementsByClassName('selected-user')[0].innerHTML += `<span class="online-status online"></span>`;
+  if (userID === selectedUserID) {
+    let el = document.getElementsByClassName('selected-user')[0].childNodes[3];
+    console.log(el);
+    el.classList.remove("offline");
+    el.classList.add("online");
+  }
+  
+  let element = document.getElementById(`contact-id-${userID}`).childNodes[1];
+  element.classList.remove("offline");
+  element.classList.add("online");
 }
 
-function userIsOffline() {
-  // if (userID === selectedUserID)
-    document.getElementsByClassName('selected-user')[0].innerHTML += `<span class="online-status offline"></span>`;
+function userIsOffline(userID) {
+  if (userID === selectedUserID) {
+    let el = document.getElementsByClassName('selected-user')[0].childNodes[3];
+    el.classList.remove("online");
+    el.classList.add("offline");
+  }
+  
+  let element = document.getElementById(`contact-id-${userID}`).childNodes[1];
+
+  element.classList.remove("online");
+  element.classList.add("offline");
 }
 
 function broadcastTyping() {
@@ -153,7 +172,8 @@ function enterSend(e) {
   //test1 if (evtobj.ctrlKey) alert("Ctrl");
   //test2 if (evtobj.keyCode == 122) alert("z");
   //test 1 & 2
-  if (evtobj.keyCode == 13 && evtobj.ctrlKey) sendMsg();
+  // if (evtobj.keyCode == 13 && evtobj.ctrlKey) sendMsg();
+  if (evtobj.keyCode == 13) sendMsg();
 }
 
 // function enterSend(event) {
@@ -167,6 +187,10 @@ function userConnected(user) {
     element.classList.remove('offline');
     element.classList.add('online');
   }
+
+  let element = document.getElementById(`contact-id-${user.id}`).childNodes[1];
+  element.classList.remove("offline");
+  element.classList.add("online");
 }
 
 function isFriend(id) {
@@ -248,8 +272,15 @@ function messageReceived(msgObj) {
       username: msgObj.senderName,
       email: msgObj.senderMail 
     });
-    userData[msgObj.senderID].sent = [];
-    userData[msgObj.senderID].received = [];
+    addSearchData([{
+      id: msgObj.senderID,
+      username: msgObj.senderName,
+      email: msgObj.senderMail 
+    }]);
+    userData[msgObj.senderID] = {
+      sent: [],
+      received: []
+    };
   }
   userData[msgObj.senderID].received.push({
     msg: msgObj.message,
@@ -269,6 +300,11 @@ function userDisconnected(user) {
     element.classList.remove('online');
     element.classList.add('offline');
   }
+
+  let element = document.getElementById(`contact-id-${user.id}`).childNodes[1];
+
+  element.classList.remove("online");
+  element.classList.add("offline");
 }
 
 function msgStatus(data) {

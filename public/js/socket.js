@@ -89,8 +89,9 @@ socket.on('user-online', data => {
   console.log("user is online");
 });
 
-socket.on('user-offline', data => {
-  userIsOffline();
+socket.on('user-offline', id => {
+  console.log(id);
+  userIsOffline(id);
 });
 
 socket.on('msg', data => {

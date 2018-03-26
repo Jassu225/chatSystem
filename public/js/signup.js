@@ -59,7 +59,8 @@ function serverResponse(response) {
   let json = JSON.parse(response);
   // console.log(json);
   if( json.affectedRows == 1) {
-    alert('Your a/c has been successfully created');
+    // alert('Your a/c has been successfully created');
+    confirm('Your a/c has been successfully created');
     gotoLoginPage();
   }
 }

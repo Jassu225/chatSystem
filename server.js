@@ -177,7 +177,7 @@ io.on("connection", (client) => {
         id: id
       });
     } else {  // user is offline
-      client.emit('user-offline');
+      client.emit('user-offline', id);
     }
   });
 

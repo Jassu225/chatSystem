@@ -1,0 +1,65 @@
+body {
+    color: white;
+}
+
+.top-navbar {
+    background-color: #313131;
+}
+
+.side-panel {
+    background-color: #5d5d59;
+    border-right: 0;
+}
+
+.search-bar {
+    font-size: 16px;
+    border-bottom: 0;
+    color: white;
+}
+
+.search-result {
+    z-index: 5;
+    background-color: rgba(82, 80, 80, 0.8);
+}
+
+.background-dark {
+    background-color: #7b7b7b !important;
+}
+
+.msg-panel {
+    background-color: #3e3e3e;
+}
+
+.msgs {
+    background-color: #484848;
+}
+
+.msg {
+    color: black;
+}
+
+.type-msg {
+    border-bottom: 0;
+    color: white;
+    font-size: 16px;
+}
+
+.footer {
+    background-color: #2d3031;
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: white;
+    font-size: 16px;
+    opacity: 0.9; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: white;
+    opacity: 0.9;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+    color: white;
+    opacity: 0.9;
+}

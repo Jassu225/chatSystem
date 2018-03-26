@@ -34,15 +34,21 @@
 .top-nav-grid {
     grid-template-rows: 1fr;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-areas:  ". . . selected-user";
 }
 
 .logout {
+    grid-column: 4 / 5;
+    text-align: end;
+}
+
+.logout img{
     width: 40px;
+    margin: 0 10px;
 }
 
 .selected-user {
-    grid-column: 4 / 5;
+    grid-row: 1 / 2;
+    grid-column: 2 / 3;
 }
 
 .online-status {
@@ -63,7 +69,7 @@
 /* Side-panel -> Contact List */
 .side-panel {
     border-right: 1px solid black;
-    max-height: 592px;
+    max-height: 608px;
 }
 
 .contact-list .contact:first-child {
@@ -75,6 +81,10 @@
     line-height: 30px;
     text-align: start;
     border-bottom: 1px solid #aba6a6;
+}
+
+.contact-list .contact .online-status {
+    margin: 10px;
 }
 
 /** Searchbar **/
@@ -112,7 +122,7 @@
 
 .msgs {
     background-color: #e5ddd5;
-    max-height: 552px;
+    max-height: 568px;
     overflow: auto;
 }
 
@@ -164,10 +174,11 @@
 .type-msg {
     font-family: "Open Sans", sans-serif, AppleGothic, "Century Gothic", CenturyGothic, "Helvetica" !important;
     resize: none;
-    width: 80%;
+    width: 83%;
     height: 20px;
     margin-bottom: -10px;
     border: 0;
+    margin-left: 10px;
     border-bottom: 1px solid black;
     background-color: transparent;
 }
