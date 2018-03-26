@@ -73,6 +73,7 @@ function showChat(chat) {
   }
   document.getElementsByClassName('msg-container')[0].innerHTML = innerHTML;
   // console.log(chat);
+  scrollToBottom();
 }
 
 function searchNameInDB(keyword) {
@@ -116,7 +117,7 @@ function selectUser(id) {
   selectedUserID = id;
   let selected = document.getElementsByClassName('selected-user')[0];
   selected.innerHTML =  `<span style="font-size: 20px;font-weight:500;color:white;">${searchData[id].username}</span><br />` +
-                            `<span style="font-size: 13px; font-weight: light;color:rgba(255,255,255,0.9);">${searchData[id].email}</span>` + 
+                            `<span style="font-size: 13px;color:rgba(255,255,255); margin-top: -3px;">${searchData[id].email}</span>` + 
                             `<span class="online-status offline"></span>`;
   document.getElementsByClassName("search-result")[0].classList.add("hide");
   document.getElementsByClassName("search-bar")[0].value = "";
@@ -291,6 +292,8 @@ function messageReceived(msgObj) {
   if (selectedUserID == msgObj.senderID) {
     document.getElementsByClassName('msg-container')[0].innerHTML += `<div id="${msgObj.messageID}" class="msg received"><span>${msgObj.message}</span></div>`;
   }
+
+  scrollToBottom();
 }
 
 function userDisconnected(user) {
@@ -319,6 +322,20 @@ function msgStatus(data) {
 
 function logout() {
   sendLogout();
+}
+
+function playSound() {
+  let audio = new Audio();
+  if(myData.sessionResumed) {
+    audio.src = "/public/audio/WelcomeBack.mp3";
+  }
+  else {
+    audio.src = "/public/audio/Welcome_female.mp3";
+    audio.volume = 0.26;
+  }
+
+  audio.load();
+  audio.play();
 }
 // function sendAJAX(data) {
 //   let xhttp = new XMLHttpRequest();

@@ -42,6 +42,7 @@ socket.on('session-id-stored', selfData => {
   myData = selfData;
   myData.friendsData = [];
   console.log(myData);
+  playSound();
   if(myData.friendsIDs) {
     let ids = myData.friendsIDs.split(";");
       for (let i = 0; i < ids.length; i++) {

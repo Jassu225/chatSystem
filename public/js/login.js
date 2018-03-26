@@ -44,7 +44,7 @@ function sendAJAX(data) {
 
 let audio = null;
 function createAudio() {
-  audio = new Audio("/public/21-naruto-main-theme.mp3");
+  audio = new Audio("/public/audio/21-naruto-main-theme.mp3");
 
 }
 

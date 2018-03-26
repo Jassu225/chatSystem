@@ -51,6 +51,7 @@ app.get("/", async (req, res) => {
   if(req.session.user) {
     let result = await db.getFriendsIDs(req.session.user.id);
     req.session.user.friendsIDs = result[0].friendsIDs;
+    req.session.user.sessionResumed = true;
     res.sendFile(path.join(srcDir, "./html/user.html"));
   } else {
     res.sendFile(path.join(srcDir, "./html/login.html"));
