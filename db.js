@@ -11,7 +11,7 @@ const dbLocalConfig = {
 };
 
 const dbConfig = {
-  host     : 'https://databases.000webhost.com/',
+  host     : 'https://99.000webhost.io',
   user     : 'id2408532_chat_system',
   password : 'password',
   database : 'id2408532_chat_system'
