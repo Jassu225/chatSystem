@@ -38,6 +38,7 @@ form.addEventListener("submit", (event) => {
     data[key] = formData.get(key);
   }
   // console.log(data);
+  data["password"] = hex_md5(hex_md5(hex_md5(data["password"])));
   sendAJAX(data);
 });
 

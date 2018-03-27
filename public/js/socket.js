@@ -111,7 +111,8 @@ socket.on('msg-ack', data => {
 // });
 
 socket.on('session-destroyed', () => {
-  window.location = "/";
+  // window.location = "/";
+  sayGoodbye();
 });
 
 socket.on("user-disconnected", user => {

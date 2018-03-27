@@ -252,7 +252,8 @@ io.on("connection", (client) => {
   });
 
   client.on('logout', () => {
-    delete socketData[client.handshake.session.user.id];
+    if(client.handshake.session && client.handshake.session.user)
+      delete socketData[client.handshake.session.user.id];
     client.handshake.session.destroy();
     client.emit('session-destroyed');
     // client.disconnect();

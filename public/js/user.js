@@ -337,6 +337,15 @@ function playSound() {
   audio.load();
   audio.play();
 }
+
+function sayGoodbye() {
+  let audio = new Audio("/public/audio/Goodbye.mp3");
+  audio.addEventListener("ended", () => {
+    window.location = "/";
+  });
+  audio.load();
+  audio.play();
+}
 // function sendAJAX(data) {
 //   let xhttp = new XMLHttpRequest();
 //   xhttp.onreadystatechange = function () {

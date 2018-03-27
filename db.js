@@ -26,7 +26,7 @@ const db = {
   connection: null,
   
   connect: function() {
-    this.connection = mysql.createConnection(dbConfig);
+    this.connection = mysql.createConnection(dbLocalConfig);
     
     this.connection.connect();
 
