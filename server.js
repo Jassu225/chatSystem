@@ -1,3 +1,4 @@
+const fs = require('fs');
 const express  = require('express');
 const app = express();
 
@@ -14,12 +15,15 @@ const session = require('express-session')({
     cookie: { secure: false }
 }); // for session management in node.js
 const sharedsession = require("express-socket.io-session");
+// const fileUpload = require('express-fileupload');
+const siofu = require("socketio-file-upload");
 const md5 = require('md5');
 const msgStatusCodes = require('./msgStatusCodes');
 
 const appRootDir = __dirname;
 const srcDir = path.join(__dirname, "./src/");
 const publicDir = path.join(__dirname, "./public/");
+const uploadsDir = path.join(__dirname, "./uploads/");
 
 const db = require("./db");
 
@@ -38,8 +42,11 @@ app.use(session);
 // app.use(session);
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+// app.use(fileUpload());
+app.use(siofu.router);
 
 app.use("/public", express.static(publicDir));
+app.use("/uploadedFiles", express.static(uploadsDir));
 
 io.use(sharedsession(session, {
   autoSave:true
@@ -111,6 +118,28 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// app.post("/uploadFiles", (req, res) => {
+//   if(req.session.user) {
+//     if(req.files.uploadedFiles instanceof Array) {
+//       req.files.uploadedFiles.forEach(file => { // multiple files
+//         file.mv( path.join(uploadsDir, file.name), function(err) {
+//           if (err)
+//             return res.status(500).send(err);
+//         });
+//       });
+//       // res.send('<script>alert("Files uploaded!")</script>');
+//       res.sendStatus(200);
+//     } else {  // single file
+//       let file = req.files.uploadedFiles;
+//       file.mv( path.join(uploadsDir, file.name), function(err) {
+//         if (err)
+//           return res.status(500).send(err);
+//         // res.send('<script>alert("File uploaded!")</script>');
+//         res.sendStatus(200);
+//       });
+//     }
+//   }
+// });
 // app.post("/search", async (req, res) => {
 //   const keyword = req.body.keyword;
 //   console.log(keyword);
@@ -126,6 +155,23 @@ app.post("/login", async (req, res) => {
 // IO (socket) connection handler
 
 io.on("connection", (client) => {
+  var uploader = new siofu();
+  uploader.dir = uploadsDir;
+  uploader.listen(client);
+
+  // Do something when a file is saved: 
+  uploader.on("saved", function(event){
+    client.emit('file-saved', {
+      name: event.file.name,
+      url: `/uploadedFiles/${event.file.name}`
+    });
+  });
+
+  // Error handler: 
+  uploader.on("error", function(event){
+      console.log("Error from uploader", event);
+  });
+
   let user = client.handshake.session.user;
   console.log('connected');
   if (user && user.id)
@@ -186,6 +232,7 @@ io.on("connection", (client) => {
     let msg = data.msg;
     let msgID = data.msgID;
     let id = data.targetUserID;
+    let msgType = data.msgType;
     let isFriend = data.isFriend;
     let msgStatusCode;
 
@@ -203,6 +250,7 @@ io.on("connection", (client) => {
         client.broadcast.to(socketData[id]).emit('msg', {
           message: msg,
           messageID: msgID,
+          msgType: msgType,
           senderID: user.id,
           senderName: user.name,
           isFriend: isFriend
@@ -211,6 +259,7 @@ io.on("connection", (client) => {
         client.broadcast.to(socketData[id]).emit('msg', {
           message: msg,
           messageID: msgID,
+          msgType: msgType,
           senderID: user.id,
           senderName: user.name,
           isFriend: isFriend,
@@ -226,6 +275,7 @@ io.on("connection", (client) => {
       receiverID: id,
       msg: msg,
       msgID: msgID,
+      msgType: msgType,
       status: msgStatusCode
     });
 
@@ -249,6 +299,28 @@ io.on("connection", (client) => {
     client.broadcast.to(socketData[id]).emit('msg-ack', {
       msgID: msgID
     });
+  });
+
+  client.on('delete-msgs', async data => {
+    let msgIDs = "(";
+    for(let i = 0; i < data.length; i++) {
+      msgIDs += `'${data[i].msgID}',`;
+      if(data[i].msgType) { // implies its an attachment
+        fs.unlink(path.join(__dirname, "./uploads", decodeURI(data[i].url.substring((data[i].url.lastIndexOf("/")+1)))), (err) => {
+          if(err) console.log(err);
+        });
+      }
+    }
+    msgIDs += "'')";
+    console.log(msgIDs);
+    let result = await db.deleteMsgs(msgIDs);
+    console.log(result);
+    if(data.length == result.affectedRows) {
+      client.emit("msgs-deleted", data);
+      let res2 = await db.getReceiverID(data[0].msgID);
+      console.log(res2);
+      client.broadcast.to(socketData[res2[0].receiverID]).emit('delete-msgs', data);
+    }
   });
 
   client.on('logout', () => {

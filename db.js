@@ -19,7 +19,7 @@ const dbConfig = {
 
 const tables = {
   userData: "CREATE TABLE IF NOT EXISTS userdata (email VARCHAR(60) NOT NULL, id BIGINT(20) NOT NULL AUTO_INCREMENT, username VARCHAR(20) NOT NULL, password VARCHAR(100) NOT NULL, friendsIDs VARCHAR(1000000), PRIMARY KEY (id), UNIQUE (email) ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci",
-  msg: "CREATE TABLE IF NOT EXISTS messages (senderID BIGINT NOT NULL, receiverID BIGINT NOT NULL, msg VARCHAR(10000) NOT NULL, msgID VARCHAR(100) NOT NULL, status INT NOT NULL, PRIMARY KEY(senderID, msgID) ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci"
+  msg: "CREATE TABLE IF NOT EXISTS messages (senderID BIGINT NOT NULL, receiverID BIGINT NOT NULL, msg VARCHAR(10000) NOT NULL, msgID VARCHAR(100) NOT NULL, msgType INT NOT NULL, status INT NOT NULL, PRIMARY KEY(senderID, msgID) ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci"
 };
 
 const db = {
@@ -31,6 +31,9 @@ const db = {
     this.connection.connect();
 
     this.promisifyQuery();
+
+    // Database existence check
+    // this.checkDatabase();
 
     // Tables existence check
     this.checkUserTable();
@@ -44,6 +47,10 @@ const db = {
 
   promisifyQuery: function() {
     this.connection.query = util.promisify(this.connection.query);
+  },
+
+  checkDatabase: function() {
+    this.exec("CREATE DATABASE IF NOT EXISTS chat_system");
   },
 
   checkUserTable: function() {
@@ -75,10 +82,10 @@ const db = {
   },
 
   getChat: async function(ids) {
-    const query1 = `SELECT msg, msgID, status FROM messages WHERE senderID = ${ids.senderID} AND receiverID = ${ids.receiverID}`;
+    const query1 = `SELECT msg, msgID, msgType, status FROM messages WHERE senderID = ${ids.senderID} AND receiverID = ${ids.receiverID}`;
     let sent = await this.exec(query1);
 
-    const query2 = `SELECT msg, msgID, status FROM messages WHERE senderID = ${ids.receiverID} AND receiverID = ${ids.senderID}`;
+    const query2 = `SELECT msg, msgID, msgType, status FROM messages WHERE senderID = ${ids.receiverID} AND receiverID = ${ids.senderID}`;
     let received = await this.exec(query2);
 
     return {
@@ -130,10 +137,20 @@ const db = {
   },
 
   saveMsg: async function(data) {
-    const query = `INSERT INTO messages (senderID, receiverID, msg, msgID, status) VALUES (${data.senderID}, ${data.receiverID}, '${data.msg}', '${data.msgID}', ${data.status})`;
+    const query = `INSERT INTO messages (senderID, receiverID, msg, msgID, msgType, status) VALUES (${data.senderID}, ${data.receiverID}, '${data.msg}', '${data.msgID}', ${data.msgType}, ${data.status})`;
     return await this.exec(query);
   },
   
+  getReceiverID: async function(msgID) {
+    const query = `SELECT receiverID FROM messages WHERE msgID = ${msgID}`;
+    return await this.exec(query);
+  },
+
+  deleteMsgs: async function(msgIDs) {
+    const query = `UPDATE messages SET msg ='<i class="deleted-msg">This message was deleted</i>', status = -1 WHERE msgID IN ${msgIDs}`;
+    return await this.exec(query);
+  },
+
   exec: async function(query) {
 
     try {

@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Chat System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/public/css/icon.css" />
     <link rel="stylesheet" href="/public/css/common.css" />
     <link rel="stylesheet" href="/public/css/generic.css" />
     <link rel="stylesheet" href="/public/css/user.css">
@@ -14,8 +15,10 @@
 <body>
     <div class="main-grid grid full-height">
         <div class="top-navbar grid-item top-nav-grid grid" >
-            <div class="logout"><img src="/public/images/lg.png" class="cursor-pointer" alt="Logout" onclick="logout()"/></div>
+            <i class="material-icons add-icon" title="add to group">add</i>
             <div class="selected-user"></div>
+            <i class="material-icons del-icon cursor-pointer hide" onclick="deleteSelectedMessages()" title="delete selected message(s)">delete</i>
+            <div class="logout"><img src="/public/images/lg.png" class="cursor-pointer" alt="Logout" onclick="logout()"/></div>
         </div>
         <div class="side-panel grid-item full-height center-text position-relative">
             <div style="background-color: #eae8e8;" class="background-dark"><input type="search" class="search-bar" placeholder="search ..." value=""onkeydown="checkKey(event)" onkeyup="searchNameInDB(this.value)"/></div>
@@ -27,8 +30,12 @@
             <div class="msgs grid-item full-width full-height">
                 <div class="msg-container full-width"></div>
             </div>
-            <div class="msg-sender grid-item">
-                <input class="type-msg" onfocus="broadcastTyping()" onblur="broadcastNotTyping()" onkeydown="enterSend(event)" placeholder="Type here ...  (ENTER to send)" ></textarea>
+            <div class="msg-sender grid-item full-height">
+                <input class="type-msg full-height" onfocus="broadcastTyping()" onblur="broadcastNotTyping()" onkeydown="enterSend(event)" placeholder="Type here ...  (ENTER to send)" ></textarea>
+                <!-- <form action="/uploadFiles" method="POST" encType="multipart/form-data" class="upload-form hide" onsubmit="event.preventDefault()"> -->
+                    <input type="file" id="siofu_input" name="uploadedFiles" onchange="fileUploadMsg(this)" class="file-uploader hide" multiple/>
+                <!-- </form> -->
+                <i class="material-icons attach-file-icon cursor-pointer full-height" onclick="openFileUploadDialog()">attach_file</i>
                 <div class="button send-btn" onclick="sendMsg()">Send</div>
             </div>
         </div>
@@ -36,6 +43,7 @@
 
         </div>
     </div>
+    <script src="/siofu/client.js"></script>
     <script src="/public/js/socket.js"></script>
     <script src="/public/js/user.js"></script>
 </body>
