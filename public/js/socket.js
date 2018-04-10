@@ -1,6 +1,6 @@
-var serverLocation = "http://localhost:3000";
+var serverLocation = "http://192.168.201.1:3000";
 
-var socket = io.connect(serverLocation);
+var socket = io.connect(window.location.href);
 var siofu = new SocketIOFileUpload(socket);
 
 var receiverSockID = null;
@@ -201,11 +201,19 @@ socket.on("grp-created", data => {
 });
 
 socket.on('added-to-grp', data => {
-  console.log(data);
-  groupData[data.id] = {
-    ...data
+  console.log(data[0]);
+  let array = data[0].membersIDs.split(";");
+  array.push(myData.id.toString());
+  console.log(array);
+  groupData[data[0].id] = {
+    ...data[0],
+    membersIDs: array
   };
-  addedToGroup(data);
+  myData.groupsData.push({
+    ...data[0],
+    membersIDs: `${data[0].membersIDs};${myData.id}`
+  });
+  addedToGroup(data[0]);
 });
 
 socket.on('file-saved', file => {

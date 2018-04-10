@@ -573,6 +573,8 @@ function messageReceived(msgObj) {
 }
 
 function groupMsgReceived(msg) {
+  if(!groupData[msg.grpID].received)
+    groupData[msg.grpID].received = [];
   groupData[msg.grpID].received.push({
     msg: msg.message,
     msgID: msg.messageID,

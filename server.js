@@ -1,12 +1,20 @@
 const fs = require('fs');
 const express  = require('express');
+const cors = require('cors');
 const app = express();
 
 const path = require('path');
 const bodyParser = require('body-parser');  // for parsing data sent in a post request
 // const redisStore = require('connect-redis')(session); // for accessing session data in socket
+app.use(cors());
 const server = require('http').createServer(app);
-const io = require('socket.io', { rememberTransport: false, transports: ['WebSocket', 'Flash Socket', 'AJAX long-polling'] })(server);
+const io = require('socket.io')(server, {
+  log: false,
+  agent: false,
+  origins: '*:*',
+  transports: ['websocket', 'htmlfile', 'xhr-polling', 'jsonp-polling', 'polling']
+});
+io.set('origins', '*:*')
 const session = require('express-session')({
     // store: new redisStore({}),
     secret: '41a6a4e1b30d55c3295bbc36230a5742', // md5 hash of 'chat_system'
@@ -44,6 +52,7 @@ app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 // app.use(fileUpload());
 app.use(siofu.router);
+// server.use(cors());
 
 app.use("/public", express.static(publicDir));
 app.use("/uploadedFiles", express.static(uploadsDir));
@@ -355,8 +364,8 @@ io.on("connection", (client) => {
   });
 
   client.on('add-grp-member',async data => {
-    // let res = await db.getGrpData(data);
-    // console.log(res[0].membersIDs.split(";"));
+    let res1 = await db.getGrpData(data);
+    console.log(res1[0].membersIDs.split(";"));
     for(let j = 0; j < data.contacts.length; j++) {
       let res =  await db.findGrpMember({
         id: data.contacts[j],
@@ -376,7 +385,7 @@ io.on("connection", (client) => {
           });
           for(let i = 0; i < data.contacts.length; i++ ) {
             if(socketData[`${data.contacts[i]}`])
-              client.broadcast.to(socketData[`${data.contacts[i]}`]).emit("added-to-grp", res);  
+              client.broadcast.to(socketData[`${data.contacts[i]}`]).emit("added-to-grp", res1);  
           }
         }
       }
