@@ -19,7 +19,9 @@ const dbConfig = {
 
 const tables = {
   userData: "CREATE TABLE IF NOT EXISTS userdata (email VARCHAR(60) NOT NULL, id BIGINT(20) NOT NULL AUTO_INCREMENT, username VARCHAR(20) NOT NULL, password VARCHAR(100) NOT NULL, friendsIDs VARCHAR(1000000), PRIMARY KEY (id), UNIQUE (email) ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci",
-  msg: "CREATE TABLE IF NOT EXISTS messages (senderID BIGINT NOT NULL, receiverID BIGINT NOT NULL, msg VARCHAR(10000) NOT NULL, msgID VARCHAR(100) NOT NULL, msgType INT NOT NULL, status INT NOT NULL, PRIMARY KEY(senderID, msgID) ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci"
+  msg: "CREATE TABLE IF NOT EXISTS messages (senderID BIGINT NOT NULL, receiverID BIGINT NOT NULL, msg VARCHAR(10000) NOT NULL, msgID VARCHAR(100) NOT NULL, msgType INT NOT NULL, status INT NOT NULL, PRIMARY KEY(senderID, msgID) ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci",
+  grpData: "CREATE TABLE IF NOT EXISTS grpdata (id VARCHAR(100) NOT NULL, name VARCHAR(100) NOT NULL, ownerID BIGINT NOT NULL, membersIDs VARCHAR(1000), PRIMARY KEY(id) ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci",
+  grpMsgs: "CREATE TABLE IF NOT EXISTS grpmessages (id VARCHAR(100) NOT NULL, senderID BIGINT NOT NULL, senderName VARCHAR(100) NOT NULL, msg VARCHAR(10000) NOT NULL, msgID VARCHAR(100) NOT NULL, msgType INT NOT NULL, status INT NOT NULL, PRIMARY KEY(id, msgID)) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci"
 };
 
 const db = {
@@ -38,6 +40,8 @@ const db = {
     // Tables existence check
     this.checkUserTable();
     this.checkMsgsTable();
+    this.checkGrpDataTable();
+    this.checkGrpMsgsTable();
   },
   
   disconnect: function() {
@@ -59,6 +63,14 @@ const db = {
 
   checkMsgsTable: function() {
     this.exec(tables.msg);
+  },
+
+  checkGrpDataTable: function() {
+    this.exec(tables.grpData);
+  },
+
+  checkGrpMsgsTable: function() {
+    this.exec(tables.grpMsgs);
   },
 
   addUser: async function(user) {
@@ -148,6 +160,52 @@ const db = {
 
   deleteMsgs: async function(msgIDs) {
     const query = `UPDATE messages SET msg ='<i class="deleted-msg">This message was deleted</i>', status = -1 WHERE msgID IN ${msgIDs}`;
+    return await this.exec(query);
+  },
+
+  createGroup: async function(data) {
+    const query = `INSERT INTO grpdata (id, name, ownerID, membersIDs) VALUES('${data.grpID}', '${data.grpName}', ${data.ownerID}, '${data.ids.join(";")};${data.ownerID}')`;
+    return await this.exec(query);
+  },
+
+  getGroupsList: async function(id) {
+    const query = `SELECT * FROM grpdata WHERE membersIDs LIKE '${id};%' OR membersIDs LIKE '%;${id};%' OR membersIDs LIKE '%;${id}'`;
+    return await this.exec(query);
+  },
+
+  getGroupChat: async function(id) {
+    const query = `SELECT * FROM grpmessages WHERE id = '${id}'`;
+    return await this.exec(query);
+  },
+
+  saveGroupMsg: async function(msg) {
+    const query = `INSERT INTO grpmessages (id, senderID, senderName, msg, msgID, msgType, status) VALUES('${msg.id}',${msg.senderID}, '${msg.senderName}','${msg.msg}','${msg.msgID}',${msg.msgType},-2)`;
+    return await this.exec(query);
+  },
+
+  deleteGrpMsgs: async function(msgIDs) {
+    const query = `UPDATE grpmessages SET msg ='<i class="deleted-msg">This message was deleted</i>', status = -1 WHERE msgID IN ${msgIDs}`;
+    return await this.exec(query);
+  },
+
+  getMembersIDs: async function(id) {
+    const query = `SELECT membersIDs FROM grpdata WHERE id = '${id}'`;
+    return await this.exec(query);
+  },
+
+  addGrpMember: async function(data) {
+    const query = `UPDATE grpdata SET membersIDs = concat(ifnull(membersIDs, ""), ';${data.id}') WHERE id = '${data.grpID}'`;
+    return await this.exec(query);
+  },
+
+  findGrpMember: async function(data) {
+    let id = data.id;
+    const query = `SELECT * FROM grpdata WHERE (membersIDs LIKE '${id};%' OR membersIDs LIKE '%;${id};%' OR membersIDs LIKE '%;${id}') AND id = '${data.grpID}'`;
+    return await this.exec(query);
+  },
+
+  getGrpData: async function(data) {
+    const query = `SELECT * FROM grpdata WHERE id = '${data.grpID}'`;
     return await this.exec(query);
   },
 

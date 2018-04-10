@@ -194,6 +194,12 @@ io.on("connection", (client) => {
     client.emit('friends-list', result);
   });
 
+  client.on('get-groups-list', async data => {
+    let result = await db.getGroupsList(user.id);
+    console.log(result);
+    client.emit('groups-info', result);
+  });
+
   client.on('get-chat', async id => {
     let result = await db.getChat({
       senderID: user.id,
@@ -302,6 +308,7 @@ io.on("connection", (client) => {
   });
 
   client.on('delete-msgs', async data => {
+    console.log(data);
     let msgIDs = "(";
     for(let i = 0; i < data.length; i++) {
       msgIDs += `'${data[i].msgID}',`;
@@ -319,7 +326,124 @@ io.on("connection", (client) => {
       client.emit("msgs-deleted", data);
       let res2 = await db.getReceiverID(data[0].msgID);
       console.log(res2);
-      client.broadcast.to(socketData[res2[0].receiverID]).emit('delete-msgs', data);
+      if(socketData[res2[0].receiverID])
+        client.broadcast.to(socketData[res2[0].receiverID]).emit('delete-msgs', data);
+    }
+  });
+
+  client.on("create-grp", async grpData => {
+    let result = await db.createGroup({
+      ...grpData,
+      ownerID: user.id
+    });
+    console.log(result);
+    client.emit("grp-created", {
+      result: result,
+      grpData: grpData
+    });
+    for(let i = 0; i < grpData.ids.length; i++) {
+      if(socketData[grpData.ids[i]])
+        client.broadcast.to(socketData[grpData.ids[i]]).emit('added-to-grp', {
+          id: grpData.grpID,
+          name: grpData.grpName,
+          membersIDs: grpData.ids.concat([`${user.id}`]),
+          ownerID: user.id,
+          received: [],
+          sent: []
+        });
+    }
+  });
+
+  client.on('add-grp-member',async data => {
+    // let res = await db.getGrpData(data);
+    // console.log(res[0].membersIDs.split(";"));
+    for(let j = 0; j < data.contacts.length; j++) {
+      let res =  await db.findGrpMember({
+        id: data.contacts[j],
+        grpID: data.grpID
+      });
+      if(res.length == 1) {
+      
+      } else {
+        let result = await db.addGrpMember({
+          id: data.contacts[j],
+          grpID: data.grpID
+        });
+        if(result.affectedRows == 1) {
+          client.emit("grp-member-added", {
+            grpID: data.grpID,
+            contact: data.contacts[j]
+          });
+          for(let i = 0; i < data.contacts.length; i++ ) {
+            if(socketData[`${data.contacts[i]}`])
+              client.broadcast.to(socketData[`${data.contacts[i]}`]).emit("added-to-grp", res);  
+          }
+        }
+      }
+    }
+  });
+
+  client.on('grp-msg', async msg => {
+    console.log(msg);
+    for(let i = 0; i < msg.membersIDs.length; i++) {
+      let id = msg.membersIDs[i];
+      if(socketData[id]) {    // online
+        client.broadcast.to(socketData[id]).emit('grp-msg', {
+          message: msg.msg,
+          messageID: msg.msgID,
+          msgType: msg.msgType,
+          senderID: user.id,
+          senderName: user.name,
+          senderMail: user.email,
+          grpID: msg.id,
+          grpName: msg.name,
+          ownerID: msg.ownerID,
+          status: msg.status
+        });
+      }
+    }
+
+    let result = await db.saveGroupMsg({
+      ...msg,
+      senderID: user.id,
+      senderName: user.name
+    });
+  });
+
+  client.on('get-grp-chat', async id => {
+    let result = await db.getGroupChat(id);
+    client.emit('grp-chat', {
+      result: result,
+      id: id
+    });
+  });
+
+  client.on('delete-grp-msgs',async dataObj => {
+    console.log(dataObj);
+    let data = dataObj.data;
+    let msgIDs = "(";
+    for(let i = 0; i < data.length; i++) {
+      msgIDs += `'${data[i].msgID}',`;
+      if(data[i].msgType) { // implies its an attachment
+        fs.unlink(path.join(__dirname, "./uploads", decodeURI(data[i].url.substring((data[i].url.lastIndexOf("/")+1)))), (err) => {
+          if(err) console.log(err);
+        });
+      }
+    }
+    msgIDs += "'')";
+    console.log(msgIDs);
+    let result = await db.deleteGrpMsgs(msgIDs);
+    console.log(result);
+    if(data.length == result.affectedRows) {
+      client.emit("grp-msgs-deleted", dataObj);
+      let res2 = await db.getMembersIDs(dataObj.grpID);
+      console.log(res2);
+      res2 = res2[0].membersIDs.split(";");
+      console.log(res2);
+      for(let j = 0; j < res2.length; j++) {
+        if(socketData[res2[j]])
+          client.broadcast.to(socketData[res2[j]]).emit('delete-grp-msgs', dataObj);
+      }
     }
   });
 

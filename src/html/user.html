@@ -13,9 +13,9 @@
     <script src="/public/js/socket.io.js"></script>
 </head>
 <body>
-    <div class="main-grid grid full-height">
+    <div class="main-grid grid full-height full-width position-absolute">
         <div class="top-navbar grid-item top-nav-grid grid" >
-            <i class="material-icons add-icon" title="add to group">add</i>
+            <i class="material-icons add-icon cursor-pointer hide" title="Add to group" onclick="addToGroup()">add</i>
             <div class="selected-user"></div>
             <i class="material-icons del-icon cursor-pointer hide" onclick="deleteSelectedMessages()" title="delete selected message(s)">delete</i>
             <div class="logout"><img src="/public/images/lg.png" class="cursor-pointer" alt="Logout" onclick="logout()"/></div>
@@ -42,6 +42,15 @@
         <div class="footer grid-item">
 
         </div>
+    </div>
+    <div class="position-absolute full-width full-height group-modal grid hide">
+        <div class="grid-item group-form center-text">
+            <select class="grp-drp-down" style="width:50%;" onchange="addMemberToGroup(this)"></select>
+            <p style="font-size:30px;color:black;">OR</p>
+            <input type="text" class="group-name" placeholder="Group Name" /><br>
+            <div class="button" onclick="hideGroupModal()">Cancel</div>
+            <div class="button" onclick="createGroup()">Submit</div>
+        </div> 
     </div>
     <script src="/siofu/client.js"></script>
     <script src="/public/js/socket.js"></script>
